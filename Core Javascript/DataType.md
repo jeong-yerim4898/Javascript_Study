@@ -68,7 +68,7 @@ var a = 'abc';
 
 ## 1-4. 기본형 데이터와 참조형 데이터
 
-#### 불변값
+### 불변값
 
 - 변수&상수 : 변경 가능성의 대상 `변수 영역 메모리`
 - 불변성 여부 : 변경 가능성의 대상 `데이터 영역 메모리`
@@ -90,7 +90,7 @@ var a = 'abc';
 
 
 
-#### 가변값
+### 가변값
 
 - 참조형 데이터는 기본적으로 가변값이 많지만 설정에 따라 변경 불가능, 불변값 활용 등 방안이 다양하다.
 
@@ -127,10 +127,10 @@ var a = 'abc';
     ```
 
   - obj.arr 에 'str'이 저장되면서 기존의 데이터의 참조 카운트는 0이 된다. 참조 카운트가 0인 메모리 주소는 **가비지 컬렉터**의 수거대상이 된다.
+  
+    
 
-
-
-#### 변수 복사 비교
+### 변수 복사 비교
 
 - 기본형 데이터
 
@@ -155,3 +155,93 @@ var a = 'abc';
   - 메모리 데이터 영역의 새로운 공간에 새 객체가 저장되고 그 조수를 변수 영역에 저장. 값이 변경
 
 - 참조형 데이터가 '가변값' 이라고 설명할 때는 참조형 데이터 자체를 변경할 경우가 아니라 그 내부의 프로퍼티 값을 변경했을 때 성립
+
+
+
+## 1-5. 불변 객체
+
+- 불변 객체가 필요할 때
+  - 값으로 전달받은 객체에 변경을 가하더라도 원본 객체는 변하지 않아야 하는 경우.
+  - **객체의 가변성**으로 `var newUser = user` 의 형태로 객체를 담을 경우 `newUser` 를 변경할 경우 원본인 `user` 의 값도 변하게 된다.
+
+### 얕은 복사와 깊은 복사
+
+- **얕은 복사**
+
+  - 바로 아래 단계의 값만 복사하는 방법.
+  - 중첩된 객체에서 참조형 데이터가 저장된 프로퍼티를 복사할 때 주솟값만 복사 
+    - 해당 프로펕에 대해 원본과 사본이 모두 동일한 참조형 데이터의 주소를 가리킨다.  = 사본을 바꾸면 원본도 같이 바뀌게 된다.
+
+  ```javascript
+  var user = {
+    name : 'Jung',
+    url : {
+      porfolie : 'http://github.com/abc',
+      blog : 'http://blog.com/abc'
+    }
+  }
+  
+  var user2 = copyObject(user); // 객체를 복사해 새로운 객체를 return하는 만든 함수
+  
+  user2.name = 'Jeong';
+  console.log(user.name === user2.name); // false
+  
+  user2.urls.blog = 'http://blog.com/def';
+  console.log(user2.urls.blog === user2.urls.blog) // true(주소값 복사로 원본과 사본 모두 변경)
+  ```
+
+  - 어떤 객체를 복사할 때, `기본형 데이터` 경우 <u>그대로 복사</u>, `참조형 데이터` 경우 <u>다시 내부의 프로퍼티들을 복사</u> 해야한다.
+
+    
+
+- **깊은 복사**
+
+  - 내부의 모든 값드을 하나하나 찾아서 복사하는 방법.
+
+  - `ES5`의 getter/setter를 복사하는 방법
+
+    - `ES6` 의 Object.getPropertyDescriptor 또는 `ES2017`	의 Object.getOwnerPropertyDescriptors 방법 밖에 없다.
+
+      
+
+- **깊은 복사 다른 방법 : JSON 활용**
+  - 객체를 JSON 문법으로 표현된 **문자열로 전환 > JSON 객체로 바꾸기**
+
+  ```javascript
+  var copyObjectViaJSON = function (target) {
+    return JSON.parse(JSON.stringfy(target));
+  }
+  ```
+
+
+
+## 1-6. undefined와 null
+
+### undefind
+
+- 사용자가 명시적으로 지정 & 자바스크립트 엔진이 자동으로 부여
+  1. 값을 대입하지 않은 변수 (메모리 주소를 지정하지 않은 식별자에 접근)
+  2. 객체 내부의 존재하지 않는 프로퍼티에 접근
+  3. Return 문이 없거나 호출되지 않는 함수의 실행결과
+- `비어있는 요소` 와 `undefined를 할당한 요소` 는 출력 결과가 다르다. '비어있는 요소'는 순회와 관련된 배열 메서드들의 순회 대상에서 제외.
+- 우리의 통제에서 벗어나는 경우만 undefined를 할당하자. 즉 직접 undefined를 할당하지 말자.
+
+
+
+### null
+
+- '비어있음'을 나타내고 싶을 때 사용
+- *<u>주의) type of null 은 object이다.</u>*
+
+```javascript
+var n = null;
+console.log(typeof n); // object
+
+console.log(n == undefined); // true
+console.log(n == null); // true
+
+console.log(n === undefined) // false
+console.log(n === null); // true
+```
+
+- null 인지 undefined인지 구분하기 위해서는 일치연산자(===)을 사용해야한다.
